@@ -1,0 +1,14 @@
+---
+- name: check shipyard-swarm-agent
+  command: docker inspect -f \{\{.State.Running\}\} shipyard-swarm-agent
+  register: status
+  changed_when: status.rc != 0
+  ignore_errors: yes
+ 
+- name: install shipyard-swarm-agent(node)
+  command: docker run -ti -d --restart=always --name shipyard-swarm-agent swarm:latest j --addr {{shipyard_ip.stdout}}:{{proxy_port}} etcd://{{manager_ip}}:{{discovery_port}} 
+  when: status.rc != 0 and install_mode == "node"
+
+- name: install shipyard-swarm-agent(manager)
+  command: docker run -ti -d --restart=always --name shipyard-swarm-agent --link shipyard-discovery:discovery swarm:latest j --addr {{shipyard_ip.stdout}}:{{proxy_port}} etcd://discovery:{{discovery_port}} 
+  when: status.rc != 0 and install_mode == "manager"

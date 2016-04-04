@@ -1,0 +1,14 @@
+---
+- name: check shipyard-swarm-manager
+  command: docker inspect -f \{\{.State.Running\}\} shipyard-swarm-manager
+  register: status
+  changed_when: status.rc != 0
+  ignore_errors: yes
+  
+- name: install shipyard-swarm-manager(node)
+  command: docker run -ti -d --restart=always --name shipyard-swarm-manager --volumes-from=shipyard-certs swarm:latest m --replication --addr {{shipyard_ip.stdout}}:{{swarm_port}} --host tcp://0.0.0.0:{{swarm_port}} etcd://{{manager_ip}}:{{discovery_port}} 
+  when: status.rc != 0 and install_mode == "node"
+
+- name: install shipyard-swarm-manager(manager)
+  command: docker run -ti -d --restart=always --name shipyard-swarm-manager --volumes-from=shipyard-certs --link shipyard-discovery:discovery swarm:latest m --replication --addr {{shipyard_ip.stdout}}:{{swarm_port}} --host tcp://0.0.0.0:{{swarm_port}} etcd://discovery:{{discovery_port}}   
+  when: status.rc != 0 and install_mode == "manager"

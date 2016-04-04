@@ -1,0 +1,10 @@
+---
+- name: check shipyard-discovery
+  command: docker inspect -f \{\{.State.Running\}\} shipyard-discovery
+  register: status
+  changed_when: status.rc != 0
+  ignore_errors: yes
+
+- name: install shipyard-discovery
+  command: docker run -ti -d -p {{discovery_port}}:{{discovery_port}} -p {{discovery_peer_port}}:{{discovery_peer_port}} --restart=always --name shipyard-discovery microbox/etcd:latest -addr {{shipyard_ip.stdout}}:{{discovery_port}} -peer-addr {{shipyard_ip.stdout}}:{{discovery_peer_port}}
+  when: status.rc != 0

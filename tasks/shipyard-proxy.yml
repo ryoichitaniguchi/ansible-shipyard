@@ -1,0 +1,10 @@
+---
+- name: check shipyard-proxy
+  command: docker inspect -f \{\{.State.Running\}\} shipyard-proxy
+  ignore_errors: yes
+  changed_when: status.rc != 0
+  register: status
+ 
+- name: install shipyard-proxy
+  command: docker run -ti -d -p {{ proxy_port }}:{{ proxy_port }} --hostname={{inventory_hostname}}  --restart=always --name shipyard-proxy -v {{docker_sock}}:{{docker_sock}} -e PORT={{ proxy_port }} --volumes-from=shipyard-certs shipyard/docker-proxy:latest
+  when: status.rc != 0

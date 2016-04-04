@@ -1,0 +1,13 @@
+---
+#
+# Test Playbook
+# manager_ip : ip of host "manager"
+#
+- hosts: manager
+ 
+  roles:
+  - { role: ../../ , install_mode: "manager" ,manager_ip: "192.168.0.2" }
+
+- hosts: node
+  roles:
+  - { role: ../../ , install_mode: "node" ,manager_ip: "192.168.0.2" }

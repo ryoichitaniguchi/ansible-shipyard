@@ -1,0 +1,33 @@
+- name: check_docker_availability
+  command: docker --version
+  register: status
+  failed_when: status.rc != 0 
+  changed_when: status.rc != 0 
+
+- name: check_install_mode
+  fail: msg="'install_mode' MUST be defined either node or manager"
+  when: install_mode != "node" and  install_mode != "manager" 
+
+
+- include: "{{ item }}"
+  with_items:
+  - "get_ip.yml"
+  - "shipyard-rethinkdb.yml"
+  - "shipyard-discovery.yml"
+  - "shipyard-certs.yml"
+  - "shipyard-proxy.yml"
+  - "shipyard-swarm-manager.yml"
+  - "shipyard-swarm-agent.yml"
+  - "shipyard-controller.yml"
+  when:  install_mode == "manager" 
+
+- include: "{{ item }}"
+  with_items:
+  - "get_ip.yml"
+  - "shipyard-certs.yml"
+  - "shipyard-proxy.yml"
+  - "shipyard-swarm-manager.yml"
+  - "shipyard-swarm-agent.yml"
+  when:  install_mode == "node" 
+
+

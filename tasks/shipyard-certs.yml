@@ -1,0 +1,11 @@
+---
+- name: check shipyard-certs
+  command: docker inspect -f \{\{.State.Running\}\} shipyard-certs
+  ignore_errors: yes
+  register: status
+  changed_when: status.rc != 0
+  
+- name: install shipyard-certs
+  command: docker run -ti -d --restart=always --name shipyard-certs -v /etc/shipyard alpine sh
+  when: status.rc != 0
+ 

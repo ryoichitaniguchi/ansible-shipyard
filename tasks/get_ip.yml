@@ -1,0 +1,5 @@
+---
+- name: get ip
+  shell: docker run --rm --net=host alpine ip route get 8.8.8.8 | awk '{ print $7; }'
+  register: shipyard_ip 
+  changed_when:  shipyard_ip.rc != 0 

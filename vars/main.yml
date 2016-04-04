@@ -1,0 +1,7 @@
+---
+proxy_port: "2375"
+docker_sock: "/var/run/docker.sock"
+swarm_port: "3375"
+shipyard_port: "18080"
+discovery_port: "4001"
+discovery_peer_port: "7001"

@@ -1,0 +1,10 @@
+---
+- name: check shipyard-rethinkdb
+  command: docker inspect -f \{\{.State.Running\}\} shipyard-rethinkdb
+  register: status
+  changed_when: status.rc != 0
+  ignore_errors: yes
+ 
+- name: install shipyard-rethinkdb
+  command: docker run -ti -d --restart=always --name shipyard-rethinkdb rethinkdb
+  when: status.rc != 0
